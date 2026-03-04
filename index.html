@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ross Hutchens</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <style>
+      :root {
+        --bg: #fafaf8;
+        --ink: #111111;
+        --mid: #888888;
+        --faint: #ddddda;
+        --accent: #c0392b;
+        --serif: "Hahmlet", Georgia, serif;
+        --mono: "DM Mono", monospace;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--serif);
+        font-size: 16px;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #bg-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      /* ── Page wrapper ───────────────────────────────────────────────── */
+      .page {
+        max-width: 620px;
+        margin: 0 auto;
+        padding: 72px 32px 0;
+      }
+
+      /* ── Header ─────────────────────────────────────────────────────── */
+      header {
+        margin-bottom: 80px;
+      }
+
+      .site-name {
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        color: var(--mid);
+        text-decoration: none;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      nav {
+        display: flex;
+        gap: 20px;
+      }
+
+      nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--mid);
+        text-decoration: none;
+        letter-spacing: 0.02em;
+      }
+
+      nav a:hover {
+        color: var(--ink);
+      }
+
+      /* ── Bio ────────────────────────────────────────────────────────── */
+      .bio {
+        margin-bottom: 100px;
+        min-height: 40vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+
+      .bio p {
+        font-size: 22px;
+        font-weight: 300;
+        line-height: 1.75;
+        letter-spacing: 0.01em;
+        color: var(--ink);
+        margin-bottom: 28px;
+      }
+
+      .bio p:last-child {
+        margin-bottom: 0;
+      }
+
+      .bio a {
+        color: var(--ink);
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        text-decoration-color: var(--faint);
+        transition:
+          text-decoration-color 0.15s,
+          color 0.15s;
+      }
+
+      .bio a:hover {
+        text-decoration-color: var(--accent);
+        color: var(--accent);
+      }
+
+      /* ── Section ────────────────────────────────────────────────────── */
+      .section {
+        margin-bottom: 64px;
+      }
+
+      .section-title {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--mid);
+        margin-bottom: 24px;
+      }
+
+      /* ── Projects blur state ────────────────────────────────────────── */
+      .projects-section {
+        scroll-margin-top: 80px;
+        filter: blur(6px);
+        opacity: 0.2;
+        transition:
+          filter 0.4s ease,
+          opacity 0.4s ease;
+        will-change: filter, opacity;
+      }
+
+      /* ── Projects ───────────────────────────────────────────────────── */
+      .project {
+        margin-bottom: 40px;
+        padding-bottom: 40px;
+        border-bottom: 1px solid var(--faint);
+      }
+
+      .project:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .project-name {
+        font-size: 17px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 4px;
+      }
+
+      .project-meta {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--mid);
+        letter-spacing: 0.06em;
+        margin-bottom: 12px;
+      }
+
+      .project-desc {
+        font-size: 15px;
+        font-weight: 300;
+        line-height: 1.8;
+        color: #333;
+        margin-bottom: 16px;
+      }
+
+      .project-desc a,
+      .bio a {
+        color: var(--ink);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-color: var(--faint);
+        transition: text-decoration-color 0.15s;
+      }
+
+      .project-desc a:hover,
+      .bio a:hover {
+        text-decoration-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .project-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .project-stack {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--mid);
+        letter-spacing: 0.04em;
+      }
+
+      .project-links {
+        display: flex;
+        gap: 16px;
+      }
+
+      .project-link {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--mid);
+        text-decoration: none;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid var(--faint);
+        padding-bottom: 1px;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+        white-space: nowrap;
+      }
+
+      .project-link:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* ── Contact ────────────────────────────────────────────────────── */
+      .contact {
+        padding-top: 8px;
+      }
+
+      .contact p {
+        font-size: 15px;
+        font-weight: 300;
+        line-height: 1.8;
+        color: var(--ink);
+        margin-bottom: 16px;
+      }
+
+      .contact a {
+        color: var(--ink);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-color: var(--faint);
+        transition:
+          text-decoration-color 0.15s,
+          color 0.15s;
+      }
+
+      .contact a:hover {
+        color: var(--accent);
+        text-decoration-color: var(--accent);
+      }
+
+      /* ── Footer ─────────────────────────────────────────────────────── */
+      footer {
+        padding: 24px 0 48px;
+        border-top: 1px solid var(--faint);
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--mid);
+        letter-spacing: 0.06em;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .back-to-top {
+        display: block;
+        margin: 0 auto 48px;
+        background: none;
+        border: none;
+        font-family: var(--mono);
+        font-size: 38px;
+        color: var(--mid);
+        cursor: pointer;
+        transition: color 0.15s;
+        padding: 8px;
+      }
+
+      .back-to-top:hover {
+        color: var(--mid);
+      }
+
+      .spacer {
+        height: 50vh;
+      }
+
+      /* ── Responsive ─────────────────────────────────────────────────── */
+      @media (max-width: 480px) {
+        .page {
+          padding: 48px 20px 0;
+        }
+        .bio p {
+          font-size: 18px;
+        }
+        footer {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- Header -->
+      <header>
+        <a href="#" class="site-name">Ross Hutchens</a>
+        <nav>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+          <a href="https://github.com/rlhutchens" target="_blank">GitHub</a>
+        </nav>
+      </header>
+
+      <!-- Bio -->
+      <div class="bio">
+        <p>
+          As a software engineer and musician, I build tools across domains. The
+          projects here reflect a focus on practical problem-solving.
+        </p>
+      </div>
+
+      <!-- Projects -->
+      <div class="section" id="projects">
+        <div class="section-title">Projects</div>
+
+        <div class="project">
+          <div class="project-name">Silent File Scanner</div>
+          <div class="project-meta">CLI Tool &nbsp;·&nbsp; Python</div>
+          <p class="project-desc">
+            A cross-platform command-line tool for finding and removing silent
+            audio files from DAW session archives. Built out of a direct need to
+            free up disk space consumed by silent takes and unused inputs from
+            recording projects. The tool recursively scans directories,
+            identifies silent audio files based on configurable thresholds,
+            generates structured JSON reports grouped by session, and routes
+            flagged files to the OS Recycle Bin.
+          </p>
+          <div class="project-footer">
+            <span class="project-stack"
+              >Python · Click · NumPy · soundfile · pytest</span
+            >
+            <a
+              href="https://github.com/rlhutchens/silentscan"
+              target="_blank"
+              rel="noopener"
+              class="project-link"
+              >Source</a
+            >
+          </div>
+        </div>
+
+        <div class="project">
+          <div class="project-name">Frequency to Cents Converter</div>
+          <div class="project-meta">
+            Web App &nbsp;·&nbsp; Vue + TypeScript &nbsp;
+          </div>
+          <p class="project-desc">
+            Converts lists of frequency values in hertz to cent offsets relative
+            to root notes. Useful for musicians interested in working with
+            discrete frequencies in a non-standard tuning system. I consider it
+            a companion tool to composing scales in
+            <a
+              href="https://www.huygens-fokker.org/scala/"
+              target="_blank"
+              rel="noopener"
+            >
+              Scala</a
+            >.
+          </p>
+          <div class="project-footer">
+            <span class="project-stack">Vue 3 · TypeScript · Vite</span>
+            <div class="project-links">
+              <a
+                href="https://freq-to-cents.netlify.app/"
+                target="_blank"
+                rel="noopener"
+                class="project-link"
+                >View</a
+              >
+              <a
+                href="https://github.com/rlhutchens/hertz-to-cents-list-converter"
+                target="_blank"
+                rel="noopener"
+                class="project-link"
+                >Source</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="section contact" id="contact">
+        <div class="section-title">Contact</div>
+        <p>
+          <a href="mailto:rosshutchens47@gmail.com">Email</a>
+          &nbsp;·&nbsp;
+          <a href="https://github.com/rlhutchens" target="_blank" rel="noopener"
+            >GitHub</a
+          >
+          &nbsp;·&nbsp;
+          <a
+            href="https://www.linkedin.com/in/rosshutchens"
+            target="_blank"
+            rel="noopener"
+            >LinkedIn</a
+          >
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <footer>
+        <span>© 2026 Ross Hutchens</span>
+        <span>Minneapolis, MN</span>
+      </footer>
+      <div class="spacer"></div>
+      <button
+        class="back-to-top"
+        onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+      >
+        &UpArrowBar;
+      </button>
+    </div>
+    <script>
+      const projectsSection = document.getElementById("projects");
+      const navProjectsLink = document.getElementById("nav-projects");
+      const contactSection = document.getElementById("contact");
+
+      function getScrollMax() {
+        // How far down the page the contact section title sits
+        return contactSection.getBoundingClientRect().top + window.scrollY;
+      }
+
+      function updateBlur() {
+        const rect = projectsSection.getBoundingClientRect();
+        const windowH = window.innerHeight;
+        const progress = Math.min(
+          1,
+          Math.max(0, (windowH - rect.top) / (windowH * 0.5)),
+        );
+        const blur = (1 - progress) * 6;
+        const opacity = 0.2 + progress * 0.8;
+        projectsSection.style.filter = `blur(${blur}px)`;
+        projectsSection.style.opacity = opacity;
+
+        // Lock scroll at contact title
+        const scrollMax = getScrollMax();
+        if (window.scrollY > scrollMax) {
+          window.scrollTo({ top: scrollMax });
+        }
+      }
+
+      window.addEventListener("scroll", updateBlur, { passive: false });
+      updateBlur();
+
+      navProjectsLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        projectsSection.scrollIntoView({ behavior: "smooth" });
+      });
+    </script>
+    <canvas id="bg-canvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("bg-canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "red";
+      ctx.fillRect(0, 0, 500, 500);
+      let animFrame;
+      let time = 0;
+
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function draw() {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Layer several slow sine-distorted blobs of very faint iridescent color
+        const blobs = [
+          { x: 0.3, y: 0.3, r: 0.55, hue: 200, dx: 0.00007, dy: 0.00005 },
+          { x: 0.7, y: 0.5, r: 0.5, hue: 280, dx: -0.00005, dy: 0.00008 },
+          { x: 0.5, y: 0.8, r: 0.45, hue: 160, dx: 0.00006, dy: -0.00006 },
+          { x: 0.2, y: 0.7, r: 0.4, hue: 320, dx: -0.00008, dy: 0.00004 },
+        ];
+
+        blobs.forEach((b, i) => {
+          const cx = (b.x + Math.sin(time * b.dx * 100 + i) * 0.12) * w;
+          const cy = (b.y + Math.cos(time * b.dy * 100 + i) * 0.1) * h;
+          const radius = b.r * Math.max(w, h);
+
+          // Thin-film hue shift over time
+          const hue = (b.hue + time * 0.001 + i * 40) % 360;
+
+          const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+          grad.addColorStop(0, `hsla(${hue}, 60%, 75%, 0.022)`);
+          grad.addColorStop(0.5, `hsla(${(hue + 40) % 360}, 50%, 80%, 0.012)`);
+          grad.addColorStop(1, `hsla(${(hue + 80) % 360}, 40%, 85%, 0)`);
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, w, h);
+        });
+
+        time++;
+        animFrame = requestAnimationFrame(draw);
+      }
+
+      function start() {
+        if (!isMobile) {
+          resize();
+          draw();
+        }
+      }
+
+      function stop() {
+        cancelAnimationFrame(animFrame);
+      }
+
+      window.addEventListener("resize", resize);
+      document.addEventListener("visibilitychange", () => {
+        document.hidden ? stop() : ((time) => draw())();
+      });
+
+      start();
+    </script>
+  </body>
+</html>
