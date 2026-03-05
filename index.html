@@ -130,6 +130,7 @@
 
       /* ── Section ────────────────────────────────────────────────────── */
       .section {
+        /* scroll-margin-top: 40px; */
         margin-bottom: 64px;
       }
 
@@ -145,7 +146,7 @@
 
       /* ── Projects blur state ────────────────────────────────────────── */
       .projects-section {
-        scroll-margin-top: 80px;
+        /* scroll-margin-top: 80px; */
         filter: blur(6px);
         opacity: 0.2;
         transition:
@@ -287,8 +288,12 @@
       }
 
       .back-to-top {
+        position: relative;
+        overflow: hidden;
         display: block;
-        margin: 0 auto 48px;
+        text-align: center;
+        padding: 40vh 0 8vh;
+        width: 100%;
         background: none;
         border: none;
         font-family: var(--mono);
@@ -296,15 +301,52 @@
         color: var(--mid);
         cursor: pointer;
         transition: color 0.15s;
-        padding: 8px;
       }
 
       .back-to-top:hover {
         color: var(--mid);
       }
 
+      .back-to-top-arrow {
+        display: inline-block;
+        transition:
+          transform 0.3s ease,
+          color 0.3s ease;
+        color: var(--faint);
+      }
+
+      .back-to-top:hover .back-to-top-arrow {
+        transform: translateY(-6px) scale(1.15);
+        color: var(--ink);
+        /* font-size: 44px; */
+      }
+
+      .hover-dome {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100vw;
+        height: 60vh;
+        background: radial-gradient(
+          ellipse at bottom,
+          rgba(255, 200, 120, 0.18) 0%,
+          rgba(255, 180, 80, 0.08) 30%,
+          transparent 70%
+        );
+        border-radius: 50% 50% 0 0;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .hover-dome.visible {
+        opacity: 1;
+      }
+
       .spacer {
-        height: 50vh;
+        height: 10vh;
       }
 
       /* ── Responsive ─────────────────────────────────────────────────── */
@@ -327,9 +369,11 @@
       <header>
         <a href="#" class="site-name">Ross Hutchens</a>
         <nav>
-          <a href="#projects">Projects</a>
-          <a href="#contact">Contact</a>
-          <a href="https://github.com/rlhutchens" target="_blank">GitHub</a>
+          <a href="#projects" id="nav-projects">Projects</a>
+          <a href="#contact" id="nav-contact">Contact</a>
+          <a href="https://github.com/rlhutchens" target="_blank" rel="noopener"
+            >GitHub</a
+          >
         </nav>
       </header>
 
@@ -436,12 +480,13 @@
         <span>Minneapolis, MN</span>
       </footer>
       <div class="spacer"></div>
-      <button
+      <div
         class="back-to-top"
         onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
       >
-        &UpArrowBar;
-      </button>
+        <span class="back-to-top-arrow"> &UpArrowBar; </span>
+      </div>
+      <div class="hover-dome" id="hover-dome"></div>
     </div>
     <script>
       const projectsSection = document.getElementById("projects");
@@ -477,7 +522,26 @@
 
       navProjectsLink.addEventListener("click", (e) => {
         e.preventDefault();
-        projectsSection.scrollIntoView({ behavior: "smooth" });
+        console.log(
+          "clicked, scrolling to:",
+          projectsSection.getBoundingClientRect().top + window.scrollY - 40,
+        );
+        const top =
+          projectsSection.getBoundingClientRect().top + window.scrollY - 40;
+        window.scrollTo({ top, behavior: "smooth" });
+      });
+
+      const navContactLink = document.getElementById("nav-contact");
+
+      navContactLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log(
+          "clicked, scrolling to:",
+          projectsSection.getBoundingClientRect().top + window.scrollY - 40,
+        );
+        const top =
+          contactSection.getBoundingClientRect().top + window.scrollY - 40;
+        window.scrollTo({ top, behavior: "smooth" });
       });
     </script>
     <canvas id="bg-canvas"></canvas>
@@ -546,6 +610,28 @@
       document.addEventListener("visibilitychange", () => {
         document.hidden ? stop() : ((time) => draw())();
       });
+
+      const backToTop = document.querySelector(".back-to-top");
+      const dome = document.getElementById("hover-dome");
+
+      backToTop.addEventListener("mouseenter", () =>
+        dome.classList.add("visible"),
+      );
+      backToTop.addEventListener("mouseleave", () =>
+        dome.classList.remove("visible"),
+      );
+
+      backToTop.addEventListener("click", () => {
+        dome.classList.remove("visible");
+      });
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          dome.classList.remove("visible");
+        },
+        { passive: true },
+      );
 
       start();
     </script>
